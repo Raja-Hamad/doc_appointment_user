@@ -89,6 +89,43 @@ class FirestoreServices {
     }
   }
 
+  // In firestore_services.dart
+Future<List<AppointmentBookingModel>> fetchUpcomingApprovedAppointments(BuildContext context) async {
+  try {
+    LocalStorage localStorage = LocalStorage();
+    String? userId = await localStorage.getValue("id");
+
+    QuerySnapshot snapshot = await _firestore
+        .collection("appointments")
+        .where("userId", isEqualTo: userId ?? "")
+        .where("bookingStatus", isEqualTo: "Approved")
+        .get();
+
+    List<AppointmentBookingModel> allApprovedAppointments = snapshot.docs.map((doc) {
+      return AppointmentBookingModel.fromJson(doc.data() as Map<String, dynamic>);
+    }).toList();
+
+    // 🔥 Fix: Filter future dates only
+    DateTime now = DateTime.now();
+
+    List<AppointmentBookingModel> upcomingAppointments = allApprovedAppointments.where((appointment) {
+      try {
+        DateTime date = DateTime.parse(appointment.appointmentDate); // Safe parse from "YYYY-MM-DD"
+        return date.isAfter(now) || date.isAtSameMomentAs(now);
+      } catch (e) {
+        print("Invalid date format in appointment: ${appointment.appointmentDate}");
+        return false;
+      }
+    }).toList();
+
+    return upcomingAppointments;
+  } catch (e) {
+    print("Error fetching upcoming appointments: $e");
+    return [];
+  }
+}
+
+
   Future<void> uploadNotification(
     NotificationModel notificationModel,
     BuildContext context,

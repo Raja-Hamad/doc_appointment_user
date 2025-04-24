@@ -7,9 +7,18 @@ import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 
 class AllAppointmentsBookingController extends GetxController {
+  RxMap<DateTime, List<AppointmentBookingModel>> calendarEvents =
+      <DateTime, List<AppointmentBookingModel>>{}.obs;
+  Rx<DateTime> selectedDate = DateTime.now().obs;
+  RxList<AppointmentBookingModel> selectedAppointments =
+      <AppointmentBookingModel>[].obs;
   var isLoading = false.obs;
   List<AppointmentBookingModel> list = <AppointmentBookingModel>[].obs;
+  List<AppointmentBookingModel> upcomingAppointmentsList =
+      <AppointmentBookingModel>[].obs;
   FirestoreServices services = FirestoreServices();
+
+  var isUpcomingAppointmentLoading = false.obs;
 
   Future<List<AppointmentBookingModel>> getAllAppointments(
     BuildContext context,
@@ -17,17 +26,17 @@ class AllAppointmentsBookingController extends GetxController {
     try {
       isLoading.value = true;
       list = await services.fetchList(context);
-      isLoading.value=false;
-        FlushBarMessages.successMessageFlushBar(
+      isLoading.value = false;
+      FlushBarMessages.successMessageFlushBar(
         "Appointments List fetched Successfully",
         context,
       );
-      if(kDebugMode){
+      if (kDebugMode) {
         print("ALL appointments List is $list");
       }
       return list;
     } catch (e) {
-      isLoading.value=false;
+      isLoading.value = false;
       if (kDebugMode) {
         print("Error while fetching appointments list ${e.toString()}");
       }
@@ -38,4 +47,41 @@ class AllAppointmentsBookingController extends GetxController {
       return [];
     }
   }
+
+  void fetchUpcomingApprovedAppointmentsMethod(BuildContext context) async {
+    isLoading.value = true;
+    final appointments = await services.fetchUpcomingApprovedAppointments(
+      context,
+    );
+
+    // Convert to calendar map
+    Map<DateTime, List<AppointmentBookingModel>> eventsMap = {};
+
+    for (var appt in appointments) {
+      try {
+        final date = DateTime.parse(
+          appt.appointmentDate,
+        ); // Format: "yyyy-MM-dd"
+        final day = DateTime(date.year, date.month, date.day); // normalize
+
+        if (eventsMap[day] == null) {
+          eventsMap[day] = [appt];
+        } else {
+          eventsMap[day]!.add(appt);
+        }
+      } catch (e) {
+        print("Invalid appointmentDate format: ${appt.appointmentDate}");
+      }
+    }
+
+    calendarEvents.value = eventsMap;
+    selectedAppointments.value = eventsMap[selectedDate.value] ?? [];
+    isLoading.value = false;
+  }
+  void onDaySelected(DateTime selected, DateTime focused) {
+  final day = DateTime(selected.year, selected.month, selected.day);
+  selectedDate.value = day;
+  selectedAppointments.value = calendarEvents[day] ?? [];
+}
+
 }
