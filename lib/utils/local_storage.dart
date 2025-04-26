@@ -11,8 +11,8 @@ class LocalStorage {
     return prefs.getString(key);
   }
 
-  Future<void> clear() async {
+  Future<void> clear(String key) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    await prefs.remove(key);
   }
 }

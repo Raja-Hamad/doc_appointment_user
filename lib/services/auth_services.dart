@@ -97,9 +97,14 @@ class AuthServices {
   }
 }
 
-  // Logout
-  Future<void> logout() async => await _auth.signOut();
-
+// Logout
+  Future<void> logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      rethrow;
+    }
+  }
 Future<void> storeUserDataLocally(UserModel user) async {
   LocalStorage localStorage = LocalStorage();
 
