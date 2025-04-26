@@ -1,4 +1,5 @@
 import 'package:doctor_appointment_user/model/user_model.dart';
+import 'package:doctor_appointment_user/views/chat_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,35 +22,43 @@ class _AdminListWidgetState extends State<AdminListWidget> {
           final admin = widget.list[index];
           return Padding(
             padding: EdgeInsets.only(bottom: 10),
-            child: ListTile(
-              leading:ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100)
+            child: GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> ChatView(
+                  adminId: admin.id,
+                  adminName: admin.name,
+                )));
+              },
+              child: ListTile(
+                leading:ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100)
+                    ),
+                    child: Image.asset("assets/images/dummy_doctor.jpg",
+                    fit: BoxFit.cover,
+                    height: 50,
+                    width: 50,),
                   ),
-                  child: Image.asset("assets/images/dummy_doctor.jpg",
-                  fit: BoxFit.cover,
-                  height: 50,
-                  width: 50,),
                 ),
-              ),
-              title: Text(
-                admin.name,
-                style: GoogleFonts.poppins(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                title: Text(
+                  admin.name,
+                  style: GoogleFonts.poppins(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              subtitle: Text(
-                admin.email,
-                style: GoogleFonts.poppins(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
+                subtitle: Text(
+                  admin.email,
+                  style: GoogleFonts.poppins(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
               ),
             ),

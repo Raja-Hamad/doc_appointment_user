@@ -211,4 +211,44 @@ class FirestoreServices {
       return [];
     }
   }
+
+   Stream<QuerySnapshot> getMessages(String currentUserId, String adminId) {
+    String chatRoomId = getChatRoomId(currentUserId, adminId);
+    return _firestore
+        .collection('chats')
+        .doc(chatRoomId)
+        .collection('messages')
+        .orderBy('timestamp', descending: false)
+        .snapshots();
+  }
+
+  Future<void> sendMessage(String currentUserId, String adminId, String message) async {
+    String chatRoomId = getChatRoomId(currentUserId, adminId);
+    final messageData = {
+      'senderId': currentUserId,
+      'receiverId': adminId,
+      'message': message,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+    await _firestore.collection('chats')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(messageData);
+
+    // Optionally update last message
+    await _firestore.collection('chats').doc(chatRoomId).set({
+      'lastMessage': message,
+      'timestamp': FieldValue.serverTimestamp(),
+      'user1': currentUserId,
+      'user2': adminId,
+    });
+  }
+
+  String getChatRoomId(String user1, String user2) {
+    if (user1.hashCode <= user2.hashCode) {
+      return "$user1\_$user2";
+    } else {
+      return "$user2\_$user1";
+    }
+  }
 }
