@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctor_appointment_user/model/appointment_booking_model.dart';
 import 'package:doctor_appointment_user/model/doctor_model.dart';
 import 'package:doctor_appointment_user/model/notification_model.dart';
+import 'package:doctor_appointment_user/model/user_model.dart';
 import 'package:doctor_appointment_user/utils/extensions/another_flushbar.dart';
 import 'package:doctor_appointment_user/utils/local_storage.dart';
 import 'package:flutter/material.dart';
@@ -90,41 +91,51 @@ class FirestoreServices {
   }
 
   // In firestore_services.dart
-Future<List<AppointmentBookingModel>> fetchUpcomingApprovedAppointments(BuildContext context) async {
-  try {
-    LocalStorage localStorage = LocalStorage();
-    String? userId = await localStorage.getValue("id");
+  Future<List<AppointmentBookingModel>> fetchUpcomingApprovedAppointments(
+    BuildContext context,
+  ) async {
+    try {
+      LocalStorage localStorage = LocalStorage();
+      String? userId = await localStorage.getValue("id");
 
-    QuerySnapshot snapshot = await _firestore
-        .collection("appointments")
-        .where("userId", isEqualTo: userId ?? "")
-        .where("bookingStatus", isEqualTo: "Approved")
-        .get();
+      QuerySnapshot snapshot =
+          await _firestore
+              .collection("appointments")
+              .where("userId", isEqualTo: userId ?? "")
+              .where("bookingStatus", isEqualTo: "Approved")
+              .get();
 
-    List<AppointmentBookingModel> allApprovedAppointments = snapshot.docs.map((doc) {
-      return AppointmentBookingModel.fromJson(doc.data() as Map<String, dynamic>);
-    }).toList();
+      List<AppointmentBookingModel> allApprovedAppointments =
+          snapshot.docs.map((doc) {
+            return AppointmentBookingModel.fromJson(
+              doc.data() as Map<String, dynamic>,
+            );
+          }).toList();
 
-    // 🔥 Fix: Filter future dates only
-    DateTime now = DateTime.now();
+      // 🔥 Fix: Filter future dates only
+      DateTime now = DateTime.now();
 
-    List<AppointmentBookingModel> upcomingAppointments = allApprovedAppointments.where((appointment) {
-      try {
-        DateTime date = DateTime.parse(appointment.appointmentDate); // Safe parse from "YYYY-MM-DD"
-        return date.isAfter(now) || date.isAtSameMomentAs(now);
-      } catch (e) {
-        print("Invalid date format in appointment: ${appointment.appointmentDate}");
-        return false;
-      }
-    }).toList();
+      List<AppointmentBookingModel> upcomingAppointments =
+          allApprovedAppointments.where((appointment) {
+            try {
+              DateTime date = DateTime.parse(
+                appointment.appointmentDate,
+              ); // Safe parse from "YYYY-MM-DD"
+              return date.isAfter(now) || date.isAtSameMomentAs(now);
+            } catch (e) {
+              print(
+                "Invalid date format in appointment: ${appointment.appointmentDate}",
+              );
+              return false;
+            }
+          }).toList();
 
-    return upcomingAppointments;
-  } catch (e) {
-    print("Error fetching upcoming appointments: $e");
-    return [];
+      return upcomingAppointments;
+    } catch (e) {
+      print("Error fetching upcoming appointments: $e");
+      return [];
+    }
   }
-}
-
 
   Future<void> uploadNotification(
     NotificationModel notificationModel,
@@ -134,10 +145,7 @@ Future<List<AppointmentBookingModel>> fetchUpcomingApprovedAppointments(BuildCon
       await _firestore
           .collection("notifications")
           .doc(notificationModel.id)
-          .set({
-            ... notificationModel.toMap(),
-            "isRead":false
-          });
+          .set({...notificationModel.toMap(), "isRead": false});
       FlushBarMessages.successMessageFlushBar(
         "Notification Uploaded Successfully",
         context,
@@ -175,6 +183,30 @@ Future<List<AppointmentBookingModel>> fetchUpcomingApprovedAppointments(BuildCon
         context,
       );
       return notificationList;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<UserModel>> getAllAdmins(BuildContext context) async {
+    try {
+      QuerySnapshot snapshot =
+          await _firestore
+              .collection("users")
+              .where("role", isEqualTo: "admin")
+              .get();
+      List<UserModel> allAdmins =
+          snapshot.docs
+              .map(
+                (json) =>
+                    UserModel.fromMap(json.data() as Map<String, dynamic>),
+              )
+              .toList();
+      FlushBarMessages.successMessageFlushBar(
+        "All Admins fetched Successfully",
+        context,
+      );
+      return allAdmins;
     } catch (e) {
       return [];
     }

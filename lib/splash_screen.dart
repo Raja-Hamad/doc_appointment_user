@@ -1,6 +1,8 @@
 
 import 'package:doctor_appointment_user/config/routes/route_names.dart';
 import 'package:doctor_appointment_user/utils/app_colors.dart';
+import 'package:doctor_appointment_user/utils/local_storage.dart';
+import 'package:doctor_appointment_user/views/bottom_nav_bar.dart';
 import 'package:doctor_appointment_user/widgets/submit_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +15,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  LocalStorage localStorage=LocalStorage();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +43,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
             const SizedBox(height: 200,),
             SubmitButtonWidget(
-              onPress: (){
-                Navigator.pushNamed(context, RouteNames.signUpRoute);
+              onPress: ()async{
+                
+                String? id = await localStorage.getValue("id");
+                if (id != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BottomNavBar()),
+                  );
+                } else {
+                  Navigator.pushNamed(context, RouteNames.signInRoute);
+                }
+            
               },
               buttonColor: AppColors.primary, title: "Get Started")
           ],

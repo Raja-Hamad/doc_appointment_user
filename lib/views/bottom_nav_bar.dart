@@ -1,8 +1,10 @@
 import 'package:doctor_appointment_user/controller/notification_controller.dart';
 import 'package:doctor_appointment_user/utils/app_colors.dart';
 import 'package:doctor_appointment_user/views/all_appointment_booking_screen.dart';
+import 'package:doctor_appointment_user/views/all_contacts.dart';
 import 'package:doctor_appointment_user/views/all_doctors_view.dart';
 import 'package:doctor_appointment_user/views/notification_view.dart';
+import 'package:doctor_appointment_user/views/profile_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,6 +27,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
     AllDoctorsView(),
     AllAppointmentBookingScreen(),
     NotificationView(),
+    ProfileView(),
+    AllContacts(),
   ];
 
   int _currentIndex = 0;
@@ -33,9 +37,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Scaffold(
       body: screens[_currentIndex],
       backgroundColor: AppColors.primary,
-      bottomNavigationBar: BottomNavigationBar(
-        selectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
-        unselectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
+   bottomNavigationBar: BottomNavigationBar(
+  currentIndex: _currentIndex,
+  type: BottomNavigationBarType.fixed,
+  backgroundColor: AppColors.primary,
+  selectedItemColor: Colors.white,
+  unselectedItemColor: Colors.white,
+  selectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
+  unselectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.person, color: Colors.white),
@@ -55,6 +64,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
               );
             }),
             label: "Notifications",
+          ),
+             BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
+          ),
+           BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: "Chats",
           ),
         ],
         onTap: (index) {

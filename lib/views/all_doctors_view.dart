@@ -2,6 +2,7 @@
 import 'package:doctor_appointment_user/controller/all_doctors_controller.dart';
 import 'package:doctor_appointment_user/utils/app_colors.dart';
 import 'package:doctor_appointment_user/widgets/all_doctors_widgets.dart';
+import 'package:doctor_appointment_user/widgets/drawer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,6 +18,8 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
   final AllDoctorsController allDoctorsController = Get.put(
     AllDoctorsController(),
   );
+    GlobalKey<ScaffoldState> globalKey=GlobalKey<ScaffoldState>();
+
 
   @override
   void initState() {
@@ -27,9 +30,16 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    
+    key: globalKey,
       backgroundColor: AppColors.background,
+       drawer: Drawer(
+        child: DrawerWidget(),
+      ),
       appBar: AppBar(
+          leading: IconButton(onPressed: (){
+          globalKey.currentState!.openDrawer();
+        }, icon: Icon(Icons.menu,
+        color: Colors.black,)),
         backgroundColor: AppColors.white,
         elevation: 1,
         centerTitle: true,

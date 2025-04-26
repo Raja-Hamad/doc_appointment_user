@@ -21,8 +21,8 @@ class UserModel {
       'name': name,
       'email': email,
       'password': password,
-      "userDeviceToken":userDeviceToken,
-      "role":role
+      "userDeviceToken": userDeviceToken,
+      "role": role,
     };
   }
 
@@ -35,5 +35,16 @@ class UserModel {
       email: map['email'] ?? '',
       password: map['password'] ?? '',
     );
+  }
+  @override
+  String toString() {
+    return 'UserModel('
+        'id: $id, '
+        'name: $name, '
+        'email: $email, '
+        'password: $password, '
+        'userDeviceToken: $userDeviceToken, '
+        'role: $role, '
+        ')';
   }
 }
