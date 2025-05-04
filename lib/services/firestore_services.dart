@@ -277,4 +277,53 @@ class FirestoreServices {
       return [];
     }
   }
+
+  Future<void> updateRegister(
+    EventsModel model,
+    BuildContext context,
+    String currentUserId,
+  ) async {
+    try {
+      final docRef = await FirebaseFirestore.instance
+          .collection("events")
+          .doc(model.id ?? "");
+
+      // Use arrayUnion to safely add without duplicates
+      await docRef.update({
+        "userIds": FieldValue.arrayUnion([currentUserId]),
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        FlushBarMessages.errorMessageFlushBar(
+          "Error while Registering for the event ${e.toString()}",
+          context,
+        );
+        print("Error while Registering for the event ${e.toString()}");
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<List<EventsModel>> getRegisteredEvents(
+    String currentUserId,
+    BuildContext context,
+  ) async {
+    try {
+      QuerySnapshot snapshot =
+          await _firestore
+              .collection("events")
+              .where("userIds", arrayContains: currentUserId)
+              .get();
+      List<EventsModel> list =
+          snapshot.docs
+              .map(
+                (json) =>
+                    EventsModel.fromJson(json.data() as Map<String, dynamic>),
+              )
+              .toList();
+      return list;
+    } catch (e) {
+      return [];
+    }
+  }
 }

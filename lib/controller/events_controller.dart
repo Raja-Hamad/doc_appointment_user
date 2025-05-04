@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 class EventsController extends GetxController {
   var selectedImage = Rxn<File>();
   RxList<EventsModel> eventsList = <EventsModel>[].obs;
+  RxList<EventsModel> registeredEventsLit = <EventsModel>[].obs;
 
   var isLoading = false.obs;
   FirestoreServices _firestoreServices = FirestoreServices();
@@ -31,6 +32,49 @@ class EventsController extends GetxController {
       return eventsList;
     } catch (e) {
       isLoading.value = false;
+      return [];
+    }
+  }
+
+  Future<void> updateRegisterField(
+    EventsModel model,
+    BuildContext context,
+    String currentUserId,
+  ) async {
+    try {
+      isLoading.value = false;
+      await _firestoreServices.updateRegister(model, context, currentUserId);
+    } catch (e) {
+      if (kDebugMode) {
+        FlushBarMessages.errorMessageFlushBar(
+          "Error while Registering for the event ${e.toString()}",
+          context,
+        );
+        print("Error while Registering for the event ${e.toString()}");
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<List<EventsModel>> fetchRegisteredEventsList(
+    String currentUserId,
+    BuildContext context,
+  ) async {
+    try {
+      isLoading.value = true;
+      registeredEventsLit.value = await _firestoreServices.getRegisteredEvents(
+        currentUserId,
+        context,
+      );
+      isLoading.value = false;
+      if (kDebugMode) {
+        print(
+          "Total length of registered events ${registeredEventsLit.length}",
+        );
+        print("Registered events list is $registeredEventsLit");
+      }
+      return registeredEventsLit;
+    } catch (e) {
       return [];
     }
   }
