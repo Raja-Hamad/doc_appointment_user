@@ -3,6 +3,7 @@ import 'package:doctor_appointment_user/utils/app_colors.dart';
 import 'package:doctor_appointment_user/utils/local_storage.dart';
 import 'package:doctor_appointment_user/views/all_appointment_booking_screen.dart';
 import 'package:doctor_appointment_user/views/all_doctors_view.dart';
+import 'package:doctor_appointment_user/views/all_events_view.dart';
 import 'package:doctor_appointment_user/views/notification_view.dart';
 import 'package:doctor_appointment_user/views/profile_view.dart';
 import 'package:doctor_appointment_user/widgets/drawer_widget_tist_tile.dart';
@@ -117,6 +118,18 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             child: DrawerWidgetListTile(
               title: "Profile",
               leadingIcon: Icon(Icons.person, color: AppColors.primary),
+            ),
+          ),
+           GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AllEventsView()),
+              );
+            },
+            child: DrawerWidgetListTile(
+              title: "Events",
+              leadingIcon: Icon(Icons.event, color: AppColors.primary),
             ),
           ),
           const SizedBox(height: 40),

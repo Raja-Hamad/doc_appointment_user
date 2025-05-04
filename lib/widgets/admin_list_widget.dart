@@ -25,6 +25,7 @@ class _AdminListWidgetState extends State<AdminListWidget> {
             child: GestureDetector(
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context)=> ChatView(
+                  adminDeviceToken: admin.userDeviceToken.toString(),
                   adminId: admin.id,
                   adminName: admin.name,
                 )));

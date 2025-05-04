@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctor_appointment_user/model/appointment_booking_model.dart';
 import 'package:doctor_appointment_user/model/doctor_model.dart';
+import 'package:doctor_appointment_user/model/events_model.dart';
 import 'package:doctor_appointment_user/model/notification_model.dart';
 import 'package:doctor_appointment_user/model/user_model.dart';
 import 'package:doctor_appointment_user/utils/extensions/another_flushbar.dart';
@@ -212,7 +213,7 @@ class FirestoreServices {
     }
   }
 
-   Stream<QuerySnapshot> getMessages(String currentUserId, String adminId) {
+  Stream<QuerySnapshot> getMessages(String currentUserId, String adminId) {
     String chatRoomId = getChatRoomId(currentUserId, adminId);
     return _firestore
         .collection('chats')
@@ -222,7 +223,11 @@ class FirestoreServices {
         .snapshots();
   }
 
-  Future<void> sendMessage(String currentUserId, String adminId, String message) async {
+  Future<void> sendMessage(
+    String currentUserId,
+    String adminId,
+    String message,
+  ) async {
     String chatRoomId = getChatRoomId(currentUserId, adminId);
     final messageData = {
       'senderId': currentUserId,
@@ -230,7 +235,8 @@ class FirestoreServices {
       'message': message,
       'timestamp': FieldValue.serverTimestamp(),
     };
-    await _firestore.collection('chats')
+    await _firestore
+        .collection('chats')
         .doc(chatRoomId)
         .collection('messages')
         .add(messageData);
@@ -249,6 +255,26 @@ class FirestoreServices {
       return "$user1\_$user2";
     } else {
       return "$user2\_$user1";
+    }
+  }
+
+  Future<List<EventsModel>> fetchEvents(BuildContext context) async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection("events").get();
+      List<EventsModel> eventsList =
+          snapshot.docs.map((json) {
+            return EventsModel.fromJson(json.data() as Map<String, dynamic>);
+          }).toList();
+      FlushBarMessages.successMessageFlushBar(
+        "Events fetched succssfully",
+        context,
+      );
+      if (kDebugMode) {
+        print("All events List in the firestore is $eventsList");
+      }
+      return eventsList;
+    } catch (e) {
+      return [];
     }
   }
 }
