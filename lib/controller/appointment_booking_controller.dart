@@ -10,7 +10,8 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 class AppointmentBookingController extends GetxController {
   FirestoreServices firestoreServices = FirestoreServices();
   var isLoading = false.obs;
-
+RxString selectedTimeSlot=''.obs;
+RxString selectedDay=''.obs;
   Future<void> appointmentBooking(
     AppointmentBookingModel model,
     BuildContext context,

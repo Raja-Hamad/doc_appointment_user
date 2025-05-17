@@ -7,11 +7,13 @@ class TextFieldWidget extends StatefulWidget {
   String label;
   TextEditingController controller;
   bool isPassword;
+  IconButton? suffixIcon;
   TextFieldWidget({
     super.key,
     required this.controller,
     required this.isPassword,
     required this.label,
+    this.suffixIcon,
   });
 
   @override
@@ -19,7 +21,6 @@ class TextFieldWidget extends StatefulWidget {
 }
 
 class _TextFieldWidgetState extends State<TextFieldWidget> {
-  
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -27,6 +28,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
       obscureText: widget.isPassword,
       cursorColor: AppColors.primary,
       decoration: InputDecoration(
+        suffixIcon: widget.suffixIcon ?? null,
         labelText: widget.label,
         labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),
         filled: true,

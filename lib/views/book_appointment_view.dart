@@ -100,10 +100,30 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
       });
     }
   }
+   List<String>? availableDays;
+   List<String>? availableTimeSlots;
 
   TextEditingController patientNameController = TextEditingController();
   TextEditingController patientNumberControler = TextEditingController();
   TextEditingController notesController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+   availableDays = widget.doctorModel.availableDays ?? [];
+   availableTimeSlots=widget.doctorModel.availableTimeSlots ?? [];
+    if (availableDays!.isNotEmpty && availableTimeSlots!.isNotEmpty) {
+      appointmentBookingController.selectedDay.value = availableDays!.first;
+      appointmentBookingController.selectedTimeSlot.value=availableTimeSlots!.first;
+    }
+    if (kDebugMode) {
+      print(
+        "Available days for the appointment are ${widget.doctorModel.availableDays}",
+      );
+      print(
+        "available time slots for the appointment are ${widget.doctorModel.availableTimeSlots}",
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,65 +156,7 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
                   isPassword: false,
                   label: "Enter Number",
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    // Pick Date
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _pickDate,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 18,
-                            horizontal: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Text(
-                            selectedDate != null
-                                ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
-                                : "Pick Date",
-                            style: GoogleFonts.poppins(
-                              color: Colors.black87,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    // Pick Time
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _pickTime,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 18,
-                            horizontal: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Text(
-                            selectedTime != null
-                                ? selectedTime!.format(context)
-                                : "Pick Time",
-                            style: GoogleFonts.poppins(
-                              color: Colors.black87,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -241,6 +203,114 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16,),
+                Text("Choose Appointment Day",
+                style: GoogleFonts.poppins(color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold),),
+                const SizedBox(height: 8,),
+                Obx(() {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: appointmentBookingController.selectedDay.value,
+                        isExpanded: true,
+                        dropdownColor: Colors.white,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: Color(0xFF38B18A),
+                        ),
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                        hint: Text(
+                          'Select Appointment Day',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        items:
+                          availableDays!.map((type) {
+                              return DropdownMenuItem(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            appointmentBookingController.selectedDay.value =
+                                value!;
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                }),
+                  const SizedBox(height: 16,),
+                Text("Choose Appointment Time Slot",
+                style: GoogleFonts.poppins(color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold),),
+                const SizedBox(height: 8,),
+                Obx(() {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: appointmentBookingController.selectedTimeSlot.value,
+                        isExpanded: true,
+                        dropdownColor: Colors.white,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: Color(0xFF38B18A),
+                        ),
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                        hint: Text(
+                          'Select Appointment Day',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        items:
+                          availableTimeSlots!.map((type) {
+                              return DropdownMenuItem(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            appointmentBookingController.selectedTimeSlot.value =
+                                value!;
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                }),
                 const SizedBox(height: 16),
                 TextFieldWidget(
                   controller: notesController,
@@ -256,17 +326,11 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
                     onPress: () async {
                       String createdAt = DateTime.now().toIso8601String(); // 🔥
 
-                      String formattedDate =
-                          selectedDate != null
-                              ? "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}"
-                              : '';
-
-                      String formattedTime =
-                          selectedTime != null
-                              ? selectedTime!.format(context)
-                              : '';
+                   
 
                       LocalStorage localStorage = LocalStorage();
+                      String selectedDay=appointmentBookingController.selectedDay.value;
+                      String selectedTimeSlot=appointmentBookingController.selectedTimeSlot.value;
 
                       String? userId = await localStorage.getValue("id");
                       String userName =
@@ -298,8 +362,8 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
                             aboutDoctor: aboutDoctor,
                             doctoImageUrl: doctorImageUrl,
                             specialization: doctorSpecialization,
-                            appointmentDate: formattedDate,
-                            appointmentTime: formattedTime,
+                         selectedDay: selectedDay.toString(),
+                         selectedTimeSlot: selectedTimeSlot.toString(),
                             bookingStatus: "Pending",
                             bookingType: bookingType,
                             createdAt: createdAt,
@@ -314,6 +378,7 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
                       appointmentBookingController
                           .appointmentBooking(appointmentBookingModel, context)
                           .then((value) async {
+
                             await submitNotification(
                               adminDeviceToken,
                               "Appointment Request",
@@ -379,6 +444,10 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
     String devicesToken,
     String doctoImageUrl,
   ) async {
+    if(kDebugMode){
+            print("Device token of the amdin is ${devicesToken.toString()}");
+
+    }
     final String serverKey = await getAccessToken();
 
     var notificationData = {
@@ -424,7 +493,6 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
   ) async {
     try {
       if (kDebugMode) {
-        print("Device Token of the user is $userDeviceToken");
         print("Notification Title of the user is $notificationTitle");
         print("Notification Body of the user is $notificationBody");
       }

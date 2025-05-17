@@ -9,14 +9,14 @@ class AppointmentBookingModel {
   final String userId;
   final String specialization;
   final String aboutDoctor;
-  final String appointmentDate;
-  final String appointmentTime;
+
   final String createdAt;
   final String bookingType;
   final String notes;
   final String bookingStatus;
   final String userDeviceToken;
-
+  final String selectedTimeSlot;
+  final String selectedDay;
   AppointmentBookingModel({
     required this.id,
     required this.aboutDoctor,
@@ -24,9 +24,10 @@ class AppointmentBookingModel {
     required this.doctoImageUrl,
     required this.adminId,
     required this.specialization,
-    required this.appointmentDate,
-    required this.appointmentTime,
+
     required this.bookingStatus,
+    required this.selectedDay,
+    required this.selectedTimeSlot,
     required this.bookingType,
     required this.createdAt,
     required this.doctorId,
@@ -47,15 +48,16 @@ class AppointmentBookingModel {
       'number': number,
       'userId': userId,
       'specialization': specialization,
-      "userDeviceToken":userDeviceToken,
+      "userDeviceToken": userDeviceToken,
       'aboutDoctor': aboutDoctor,
-      'appointmentDate': appointmentDate,
-      'appointmentTime': appointmentTime,
+
       'createdAt': createdAt,
-      'adminId':adminId,
+      'adminId': adminId,
       'bookingType': bookingType,
       'notes': notes,
       'bookingStatus': bookingStatus,
+      'selectedTimeSlot': selectedTimeSlot.toString(),
+      "selectedDay": selectedDay.toString(),
     };
   }
 
@@ -72,17 +74,18 @@ class AppointmentBookingModel {
       userId: json['userId'] ?? '',
       specialization: json['specialization'] ?? '',
       aboutDoctor: json['aboutDoctor'] ?? '',
-      appointmentDate: json['appointmentDate'] ?? '',
-      appointmentTime: json['appointmentTime'] ?? '',
+
       createdAt: json['createdAt'] ?? '',
       bookingType: json['bookingType'] ?? '',
       notes: json['notes'] ?? '',
       bookingStatus: json['bookingStatus'] ?? '',
+      selectedDay: json['selectedDay'] ?? "",
+      selectedTimeSlot: json['selectedTimeSlot'] ?? '',
     );
   }
   @override
-String toString() {
-  return '''
+  String toString() {
+    return '''
 AppointmentBookingModel {
   id: $id,
   doctorName: $doctorName,
@@ -94,13 +97,14 @@ AppointmentBookingModel {
   userId: $userId,
   specialization: $specialization,
   aboutDoctor: $aboutDoctor,
-  appointmentDate: $appointmentDate,
-  appointmentTime: $appointmentTime,
+
   userDeviceToken:$userDeviceToken,
   createdAt: $createdAt,
   bookingType: $bookingType,
   notes: $notes,
-  bookingStatus: $bookingStatus
+  bookingStatus: $bookingStatus,
+  selectedDay:$selectedDay,
+  selectedTimeSlot:$selectedTimeSlot
 }''';
-}
+  }
 }

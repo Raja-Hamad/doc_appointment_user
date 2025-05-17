@@ -2,6 +2,7 @@ import 'package:doctor_appointment_user/controller/events_controller.dart';
 import 'package:doctor_appointment_user/model/events_model.dart';
 import 'package:doctor_appointment_user/utils/app_colors.dart';
 import 'package:doctor_appointment_user/utils/extensions/another_flushbar.dart';
+import 'package:doctor_appointment_user/views/registered_events_view.dart';
 import 'package:doctor_appointment_user/widgets/submit_button_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -100,77 +101,31 @@ class _EventDetailsViewState extends State<EventDetailsView> {
                         ? "Registered"
                         : "Register",
                 onPress: () {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (ctx) => AlertDialog(
-                          title: Text(
-                            "Event Registration",
-                            style: GoogleFonts.poppins(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          content: Text(
-                            "Are you sure want to register for this event?",
-                            style: GoogleFonts.poppins(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          actions: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                  widget.model.userIds!.contains(currentUserId)
+                      ? showDialog(
+                        context: context,
+                        builder:
+                            (ctx) => AlertDialog(
+                              title: Text(
+                                "Event Registration",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              content: Text(
+                                "Already registered for this event.",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                              actions: [
                                 InkWell(
                                   onTap: () {
                                     Navigator.pop(ctx); // Close dialog
-                                  },
-                                  child: Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 30,
-                                          ),
-                                          child: Text(
-                                            "Cancel",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 2),
-                                GestureDetector(
-                                  onTap: () async {
-                                    Navigator.pop(ctx); // Close dialog
-
-                                    await eventsController.updateRegisterField(
-                                      widget.model,
-                                      ctx,
-                                      currentUserId ?? "",
-                                    );
-
-                                    // Refresh doctor list
-                                    await eventsController.fetchEvents(ctx);
-                                    FlushBarMessages.successMessageFlushBar(
-                                      "Registered for this event successfully",
-                                      context,
-                                    );
                                   },
                                   child: Expanded(
                                     flex: 1,
@@ -186,7 +141,7 @@ class _EventDetailsViewState extends State<EventDetailsView> {
                                             horizontal: 30,
                                           ),
                                           child: Text(
-                                            "Register",
+                                            "Ok",
                                             style: GoogleFonts.poppins(
                                               fontSize: 14,
                                               color: Colors.white,
@@ -199,9 +154,118 @@ class _EventDetailsViewState extends State<EventDetailsView> {
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                  );
+                      )
+                      : showDialog(
+                        context: context,
+                        builder:
+                            (ctx) => AlertDialog(
+                              title: Text(
+                                "Event Registration",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              content: Text(
+                                "Are you sure want to register for this event?",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                              actions: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pop(ctx); // Close dialog
+                                      },
+                                      child: Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 30,
+                                                  ),
+                                              child: Text(
+                                                "Cancel",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        Navigator.pop(ctx); // Close dialog
+                                        Navigator.pop(ctx);
+
+                                        await eventsController
+                                            .updateRegisterField(
+                                              widget.model,
+                                              ctx,
+                                              currentUserId ?? "",
+                                            );
+
+                                        // Refresh doctor list
+                                        await eventsController.fetchEvents(ctx);
+                                        FlushBarMessages.successMessageFlushBar(
+                                          "Registered for this event successfully",
+                                          context,
+                                        );
+                                      },
+
+                                      child: Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primary,
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 30,
+                                                  ),
+                                              child: Text(
+                                                "Register",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                      );
                 },
               ),
             ],

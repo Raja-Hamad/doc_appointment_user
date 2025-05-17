@@ -21,7 +21,8 @@ class _AllEventsListWidgetState extends State<AllEventsListWidget> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: (ListView.builder(
+      child: (
+        ListView.builder(
         itemCount: widget.list.length,
         itemBuilder: (context, index) {
           final event = widget.list[index];

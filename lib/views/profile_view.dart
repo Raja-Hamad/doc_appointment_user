@@ -19,6 +19,12 @@ class _ProfileViewState extends State<ProfileView> {
   LocalStorage localStorage = LocalStorage();
   String? email;
   String? name;
+  String? address;
+  String? phone;
+  String? dob;
+  String? gender;
+  String? imageUrl;
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +34,11 @@ class _ProfileViewState extends State<ProfileView> {
   void getValues() async {
     email = await localStorage.getValue("email");
     name = await localStorage.getValue("name");
+    address = await localStorage.getValue("address");
+    phone = await localStorage.getValue("phone");
+    dob = await localStorage.getValue("dob");
+    gender = await localStorage.getValue("gender");
+    imageUrl = await localStorage.getValue("imageUrl");
 
     if (kDebugMode) {
       print("Name of the user is ${name ?? ""}");
@@ -42,42 +53,83 @@ class _ProfileViewState extends State<ProfileView> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Profile 👋",
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Profile 👋",
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              ReusableContainerWidget(title: "Name", containerText: name ?? ""),
-              const SizedBox(height: 16),
-              ReusableContainerWidget(
-                containerText: email ?? "",
-                title: "Email",
-              ),
-              const SizedBox(height: 40),
-              SubmitButtonWidget(
-                buttonColor: AppColors.primary,
-                title: "Update Profile",
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => UpdateProfileView(
-                            email: email ?? "",
-                            name: name ?? "",
-                          ),
+                const SizedBox(height: 24),
+                Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(40), // Make it circular
+                    child: Image.network(
+                      imageUrl ?? "",
+                      height: 80,
+                      width: 80,
+                      fit: BoxFit.cover,
                     ),
-                  );
-                },
-              ),
-            ],
+                  ),
+                ),
+                ReusableContainerWidget(
+                  title: "Name",
+                  containerText: name ?? "",
+                ),
+                const SizedBox(height: 16),
+                ReusableContainerWidget(
+                  containerText: email ?? "",
+                  title: "Email",
+                ),
+                const SizedBox(height: 16),
+                ReusableContainerWidget(
+                  containerText: address ?? "",
+                  title: "Address",
+                ),
+                const SizedBox(height: 16),
+                ReusableContainerWidget(
+                  containerText: phone ?? "",
+                  title: "Contact Number",
+                ),
+                const SizedBox(height: 16),
+                ReusableContainerWidget(
+                  containerText: dob ?? "",
+                  title: "Date Of Birth",
+                ),
+                const SizedBox(height: 16),
+                ReusableContainerWidget(
+                  containerText: gender ?? "",
+                  title: "Gender",
+                ),
+                const SizedBox(height: 40),
+                SubmitButtonWidget(
+                  buttonColor: AppColors.primary,
+                  title: "Update Profile",
+                  onPress: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => UpdateProfileView(
+                              phone: phone ?? "",
+                              imageUrl: imageUrl ?? "",
+                              address: address ?? "",
+                              email: email ?? "",
+                              name: name ?? "",
+                              dob: dob ?? "",
+                              gender: gender ?? "",
+                            ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

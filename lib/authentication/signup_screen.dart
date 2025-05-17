@@ -1,3 +1,5 @@
+import 'dart:io';
+
 
 import 'package:doctor_appointment_user/config/routes/route_names.dart';
 import 'package:doctor_appointment_user/controller/signup_controller.dart';
@@ -47,13 +49,41 @@ class _SignupScreenState extends State<SignupScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Welcome User 👋",
+                "Welcome Admin 👋",
                 style: GoogleFonts.poppins(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 24),
+              // Profile Image Picker
+              Center(
+                child: Obx(() {
+                  return InkWell(
+                    onTap: signupController.pickImageFromGallery,
+                    child:
+                        signupController.selectedImage.value == null
+                            ? CircleAvatar(
+                              backgroundColor: AppColors.white,
+                              radius: 40,
+                              child: const Icon(Icons.camera_alt),
+                            )
+                            : ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                40,
+                              ), // Make it circular
+                              child: Image.file(
+                                signupController.selectedImage.value!,
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                  );
+                }),
+              ),
+
+              const SizedBox(height: 16),
               TextFieldWidget(
                 label: "Full Name",
                 controller: nameController,
@@ -71,6 +101,90 @@ class _SignupScreenState extends State<SignupScreen> {
                 controller: passwordController,
                 isPassword: true,
               ),
+              const SizedBox(height: 16),
+              TextFieldWidget(
+                label: "Address",
+                controller: signupController.addressController.value,
+                isPassword: false,
+              ),
+              const SizedBox(height: 16),
+              TextFieldWidget(
+                label: "Contact Number",
+                controller: signupController.phoneController.value,
+                isPassword: false,
+              ),
+              const SizedBox(height: 16),
+              Obx(
+                () => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: DropdownButtonFormField<String>(
+                    value:
+                        signupController.selectedGender.value.isNotEmpty
+                            ? signupController.selectedGender.value
+                            : null,
+                    decoration: InputDecoration(
+                      labelText: "Gender",
+                      labelStyle: GoogleFonts.poppins(
+                        color: AppColors.textSecondary,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    items:
+                        ["Male", "Female", "Other"].map((gender) {
+                          return DropdownMenuItem(
+                            value: gender,
+                            child: Text(gender, style: GoogleFonts.poppins()),
+                          );
+                        }).toList(),
+                    onChanged: (value) {
+                      signupController.selectedGender.value = value!;
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Obx(
+                () => GestureDetector(
+                  onTap: () => signupController.pickDate(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          signupController.selectedDob.value.isEmpty
+                              ? "Select Date of Birth"
+                              : signupController.selectedDob.value,
+                          style: GoogleFonts.poppins(
+                            color:
+                                signupController.selectedDob.value.isEmpty
+                                    ? AppColors.textSecondary
+                                    : AppColors.textPrimary,
+                          ),
+                        ),
+                        const Icon(
+                          Icons.calendar_today,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 32),
               Obx(() {
                 return SubmitButtonWidget(
@@ -79,7 +193,20 @@ class _SignupScreenState extends State<SignupScreen> {
                   title: "Register",
                   onPress: () {
                     signupController.registerAdmin(
-                    
+                      image:
+                          signupController.selectedImage.value != null
+                              ? File(signupController.selectedImage.value!.path)
+                              : null,
+                      address:
+                          signupController.addressController.value.text
+                              .trim()
+                              .toString(),
+                      phone:
+                          signupController.phoneController.value.text
+                              .trim()
+                              .toString(),
+                      gender: signupController.selectedGender.value,
+                      dob: signupController.selectedDob.value,
                       name: nameController.text.trim().toString(),
                       email: emailController.text.trim().toString(),
                       password: passwordController.text.trim().toString(),

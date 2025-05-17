@@ -1,7 +1,7 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctor_appointment_user/controller/events_controller.dart';
-import 'package:doctor_appointment_user/utils/app_colors.dart';
-import 'package:doctor_appointment_user/widgets/all_events_list_widget.dart';
+import 'package:doctor_appointment_user/model/events_model.dart';
+import 'package:doctor_appointment_user/views/event_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
@@ -25,7 +25,6 @@ class _AllEventsViewState extends State<AllEventsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(24),
@@ -43,26 +42,115 @@ class _AllEventsViewState extends State<AllEventsView> {
                 ),
               ),
               const SizedBox(height: 20),
-              Obx(() {
-                if (eventsController.isLoading.value) {
-                  return Center(
-                    child: CircularProgressIndicator(color: Colors.black),
-                  );
-                } else if (eventsController.eventsList.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No Events yet",
-                      style: GoogleFonts.poppins(color: Colors.black),
-                    ),
-                  );
-                } else if (eventsController.eventsList.isNotEmpty) {
-                  return AllEventsListWidget(
-                    list: eventsController.eventsList,
-                  );
-                } else {
-                  return SizedBox();
-                }
-              }),
+              Expanded(
+                child: StreamBuilder(
+                  stream:
+                      FirebaseFirestore.instance
+                          .collection("events")
+                          .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: CircularProgressIndicator(color: Colors.black),
+                      );
+                    } else {
+                      final eventsList =
+                          snapshot.data!.docs
+                              .map((json) => EventsModel.fromJson(json.data()))
+                              .toList();
+                      return ListView.builder(
+                        itemCount: eventsList.length,
+                        itemBuilder: (context, index) {
+                          final event = eventsList[index];
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                EventDetailsView(model: event),
+                                      ),
+                                    );
+                                  },
+                                  child: ListTile(
+                                    title: Text(
+                                      event.eventTitle.toString(),
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    subtitle: Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            event.eventDescription.toString(),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.black,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                          ),
+                                          Text(event.eventDate.toString()),
+                                        ],
+                                      ),
+                                    ),
+                                    leading: ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: Container(
+                                        height: 50,
+                                        width: 50,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            100,
+                                          ),
+                                        ),
+
+                                        child: Image.network(
+                                          event.imageUrl.toString(),
+                                          height: 50,
+                                          width: 50,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    trailing: Text(
+                                      event.eventTime.toString(),
+                                      style: GoogleFonts.poppins(),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Container(
+                                  height: .5,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         ),

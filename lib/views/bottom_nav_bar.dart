@@ -37,14 +37,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Scaffold(
       body: screens[_currentIndex],
       backgroundColor: AppColors.primary,
-   bottomNavigationBar: BottomNavigationBar(
-  currentIndex: _currentIndex,
-  type: BottomNavigationBarType.fixed,
-  backgroundColor: AppColors.primary,
-  selectedItemColor: Colors.white,
-  unselectedItemColor: Colors.white,
-  selectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
-  unselectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: AppColors.primary,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white,
+        selectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
+        unselectedLabelStyle: GoogleFonts.poppins(color: Colors.white),
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.person, color: Colors.white),
@@ -65,14 +65,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
             }),
             label: "Notifications",
           ),
-             BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
-           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: "Chats",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chats"),
         ],
         onTap: (index) {
           setState(() {
@@ -85,7 +79,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     String? adminId = FirebaseAuth.instance.currentUser?.uid;
 

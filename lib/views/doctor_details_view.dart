@@ -80,7 +80,85 @@ class _DoctorDetailsViewState extends State<DoctorDetailsView> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 100),
+              const SizedBox(height: 20),
+              Text(
+                "Available Days",
+                style: GoogleFonts.poppins(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.doctorModel.availableDays!.length,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 5.0,
+                          width: 5.0,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5,),
+                        Text(
+                          widget.doctorModel.availableDays![index].toString(),
+                          style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+                            const SizedBox(height: 20),
+              Text(
+                "Available time slots",
+                style: GoogleFonts.poppins(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.doctorModel.availableTimeSlots!.length,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 5.0,
+                          width: 5.0,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5,),
+                        Text(
+                          widget.doctorModel.availableTimeSlots![index].toString(),
+                          style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 60),
               SubmitButtonWidget(
                 buttonColor: AppColors.primary,
                 title: "Book Appointment",

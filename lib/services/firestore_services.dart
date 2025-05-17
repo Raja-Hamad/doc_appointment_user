@@ -1,14 +1,23 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctor_appointment_user/model/appointment_booking_model.dart';
+import 'package:doctor_appointment_user/model/comment_model.dart';
 import 'package:doctor_appointment_user/model/doctor_model.dart';
 import 'package:doctor_appointment_user/model/events_model.dart';
+import 'package:doctor_appointment_user/model/feedback_model.dart';
+import 'package:doctor_appointment_user/model/invoice_model.dart';
 import 'package:doctor_appointment_user/model/notification_model.dart';
+import 'package:doctor_appointment_user/model/report_comment_model.dart';
+import 'package:doctor_appointment_user/model/report_post_model.dart';
 import 'package:doctor_appointment_user/model/user_model.dart';
 import 'package:doctor_appointment_user/utils/extensions/another_flushbar.dart';
 import 'package:doctor_appointment_user/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 class FirestoreServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -113,25 +122,7 @@ class FirestoreServices {
             );
           }).toList();
 
-      // 🔥 Fix: Filter future dates only
-      DateTime now = DateTime.now();
-
-      List<AppointmentBookingModel> upcomingAppointments =
-          allApprovedAppointments.where((appointment) {
-            try {
-              DateTime date = DateTime.parse(
-                appointment.appointmentDate,
-              ); // Safe parse from "YYYY-MM-DD"
-              return date.isAfter(now) || date.isAtSameMomentAs(now);
-            } catch (e) {
-              print(
-                "Invalid date format in appointment: ${appointment.appointmentDate}",
-              );
-              return false;
-            }
-          }).toList();
-
-      return upcomingAppointments;
+      return allApprovedAppointments;
     } catch (e) {
       print("Error fetching upcoming appointments: $e");
       return [];
@@ -324,6 +315,207 @@ class FirestoreServices {
       return list;
     } catch (e) {
       return [];
+    }
+  }
+
+  Stream<List<InvoiceModel>> getInvoicesStream(String userId) {
+    return _firestore
+        .collection("invoices")
+        .where("userId", isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return InvoiceModel.fromJson(doc.data() as Map<String, dynamic>);
+          }).toList();
+        });
+  }
+
+  Future<String> uploadImageToCloudinary(
+    File imageFile,
+    BuildContext context,
+  ) async {
+    final cloudName = 'dqs1y6urv'; // Replace with your Cloudinary Cloud Name
+    final apiKey = '463369248646777'; // Replace with your Cloudinary API Key
+    final preset =
+        'ecommerce_preset'; // Replace with your Cloudinary Upload Preset
+
+    final url = Uri.parse(
+      'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
+    );
+    final request =
+        http.MultipartRequest('POST', url)
+          ..fields['upload_preset'] = preset
+          ..files.add(
+            await http.MultipartFile.fromPath('file', imageFile.path),
+          );
+
+    final response = await request.send();
+    if (response.statusCode == 200) {
+      FlushBarMessages.successMessageFlushBar(
+        "Image Uploaded Successfully",
+        context,
+      );
+      final res = await http.Response.fromStream(response);
+      final data = jsonDecode(res.body);
+      return data['secure_url']; // Image URL from Cloudinary
+    } else {
+      FlushBarMessages.errorMessageFlushBar("Failed to upload Image", context);
+      throw Exception('Failed to upload image to Cloudinary');
+    }
+  }
+
+  Future<void> uploadReponse(
+    Map<String, dynamic> data,
+    String questionId,
+    String surveyId,
+    BuildContext context,
+  ) async {
+    try {
+      await _firestore.collection("survey_questions").doc(questionId).update({
+        "answersList": FieldValue.arrayUnion([data]),
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        FlushBarMessages.errorMessageFlushBar(
+          "Error while uploading the response ${e.toString()}",
+          context,
+        );
+        print("Error while uplaoding the response ${e.toString()}");
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<void> addComment(CommentModel model, BuildContext context) async {
+    try {
+      await _firestore
+          .collection("comments")
+          .doc(model.commentId!)
+          .set(model.toMap());
+      FlushBarMessages.successMessageFlushBar(
+        "Successfully uploaded the comment",
+        context,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        FlushBarMessages.errorMessageFlushBar(
+          "Error while uploading the comment ${e.toString()}",
+          context,
+        );
+        print("Error while uplaoding the comment ${e.toString()}");
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<void> addReport(ReportCommentModel model, BuildContext context) async {
+    try {
+      await _firestore
+          .collection("reported_comments")
+          .doc(model.reportId!)
+          .set(model.toMap());
+      FlushBarMessages.successMessageFlushBar(
+        "Report added successfully",
+        context,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        FlushBarMessages.errorMessageFlushBar(
+          "Error while uploading the report ${e.toString()}",
+          context,
+        );
+        print("Error while uplaoding the report ${e.toString()}");
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<void> deleteComment(String commentId, BuildContext context) async {
+    try {
+      await _firestore.collection("comments").doc(commentId).delete();
+    } catch (e) {
+      if (kDebugMode) {
+        FlushBarMessages.errorMessageFlushBar(
+          "Error while delelting the comment ${e.toString()}",
+          context,
+        );
+        print("Error while deleting the comment ${e.toString()}");
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<void> addPostReport(
+    ReportPostModel model,
+    BuildContext context,
+  ) async {
+    try {
+      await _firestore
+          .collection("reported_posts")
+          .doc(model.reportId!)
+          .set(model.toMap());
+      FlushBarMessages.successMessageFlushBar(
+        "Report added successfully",
+        context,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        FlushBarMessages.errorMessageFlushBar(
+          "Error while uploading the report ${e.toString()}",
+          context,
+        );
+        print("Error while uplaoding the report ${e.toString()}");
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  final String _collection = "feedback";
+
+  Future<void> submitFeedback(
+    String question,
+    FeedbackResponseModel response,
+  ) async {
+    // 1. Get a reference to the 'masterFeedback' document inside the 'feedback' collection
+    final feedbackDoc = _firestore
+        .collection(_collection)
+        .doc("masterFeedback");
+
+    // 2. Get the current snapshot (data) of that document
+    final docSnapshot = await feedbackDoc.get();
+
+    if (docSnapshot.exists) {
+      // 3. If the document exists, read the 'feedback' list (or an empty list if not found)
+      List<dynamic> feedbackList = docSnapshot.data()?['feedback'] ?? [];
+
+      // 4. Look inside the list to find the index of the question that matches the provided question
+      int index = feedbackList.indexWhere(
+        (f) => f['questionStatement'] == question,
+      );
+
+      if (index != -1) {
+        // 5. If the question already exists, add the new user's response to the 'responses' list of that question
+        feedbackList[index]['responses'].add(response.toMap());
+      } else {
+        // 6. If the question doesn't exist, add a new question object with the user's response
+        feedbackList.add({
+          'questionStatement': question,
+          'responses': [response.toMap()],
+        });
+      }
+
+      // 7. Update the document in Firestore with the updated feedback list
+      await feedbackDoc.update({'feedback': feedbackList});
+    } else {
+      // 8. If the document itself doesn't exist, create it with a feedback list that includes this new question and response
+      await feedbackDoc.set({
+        'feedback': [
+          {
+            'questionStatement': question,
+            'responses': [response.toMap()],
+          },
+        ],
+      });
     }
   }
 }

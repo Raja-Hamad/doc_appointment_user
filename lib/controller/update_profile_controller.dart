@@ -1,16 +1,42 @@
 
 import 'package:doctor_appointment_user/config/routes/route_names.dart';
+import 'package:doctor_appointment_user/services/firestore_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class UpdateProfileController extends GetxController {
   var textEditingControllerEmail = TextEditingController().obs;
   var textEditingControllerName = TextEditingController().obs;
+  var textEditingControllerPhone = TextEditingController().obs;
+  var textEditingControllerAddress = TextEditingController().obs;
+  FirestoreServices _firestoreServices = FirestoreServices();
+  RxString dob = ''.obs;
+  RxString gender = ''.obs;
   var isLoading = false.obs;
+  var selectedImage = Rxn<File>();
 
-  Future<void> updateProfile(String newEmail, String newName, BuildContext context) async {
+  Future<void> pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      selectedImage.value = File(picked.path);
+    }
+  }
+
+  Future<void> updateProfile(
+    String newEmail,
+    String newName,
+    String dob,
+    String gender,
+    String phone,
+    String address,
+    File? imageFile,
+    BuildContext context,
+  ) async {
     try {
       isLoading.value = true;
 
@@ -27,19 +53,31 @@ class UpdateProfileController extends GetxController {
       if (currentUser.email != newEmail) {
         await currentUser.verifyBeforeUpdateEmail(newEmail);
       }
+      String? imageUrl;
+      if (imageFile != null) {
+        imageUrl = await _firestoreServices.uploadImageToCloudinary(
+          imageFile,
+          context,
+        );
+      }
 
       // ✅ Step 2: Update Firestore user info
       await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser.uid)
           .update({
-        'email': newEmail,
-        'name': newName,
-      });
+            'email': newEmail,
+            'name': newName,
+            'dob': dob,
+            'gender': gender,
+            'address': address,
+            'phone': phone,
+            'imageUrl': imageUrl,
+          });
 
       // ✅ Step 3: Remove from local storage (already done by you)
       // ✅ Step 4: Navigate to login screen
-Navigator.pushNamed(context, RouteNames.signInRoute);
+      Navigator.pushNamed(context, RouteNames.signInRoute);
     } catch (e) {
       Get.snackbar("Error", e.toString());
     } finally {

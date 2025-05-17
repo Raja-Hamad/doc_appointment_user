@@ -1,5 +1,6 @@
 import 'package:doctor_appointment_user/model/appointment_booking_model.dart';
 import 'package:doctor_appointment_user/utils/app_colors.dart';
+import 'package:doctor_appointment_user/views/feeback_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,7 +20,7 @@ class _AllAppointmentsWidgetState extends State<AllAppointmentsWidget> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: widget.allAppointments.length,
-    
+
       itemBuilder: (context, index) {
         final appointment = widget.allAppointments[index];
         return Padding(
@@ -29,91 +30,106 @@ class _AllAppointmentsWidgetState extends State<AllAppointmentsWidget> {
             // height: 300,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: Container(
-                      height: 50,
-                      width: 50,
+              child: GestureDetector(
+                onTap: () {
+                  appointment.bookingStatus == "Completed"
+                      ? Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => FeebackView(
+                                appointmentBookingModel: appointment,
+                              ),
+                        ),
+                      )
+                      : null;
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Image.network(
+                          appointment.doctoImageUrl,
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            appointment.doctorName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            appointment.specialization,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          Text(
+                            "Day: ${appointment.selectedDay}",
+                            style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            "Time: ${appointment.selectedTimeSlot}",
+                            style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      height: 30,
+                      width: 100,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
+                        color:
+                            appointment.bookingStatus == "Approved"
+                                ? AppColors.primary
+                                : appointment.bookingStatus == "Cancelled"
+                                ? AppColors.error
+                                : Colors.amber,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Image.network(
-                        appointment.doctoImageUrl,
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          appointment.doctorName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      child: Center(
+                        child: Text(
+                          appointment.bookingStatus,
+                          style: GoogleFonts.poppins(color: Colors.white),
                         ),
-                        Text(
-                          appointment.specialization,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                        Text(
-                          "Date: ${appointment.appointmentDate}",
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          "Time: ${appointment.appointmentTime}",
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 30,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color:
-                          appointment.bookingStatus == "Approved"
-                              ? AppColors.primary
-                              : appointment.bookingStatus == "Cancelled"
-                              ? AppColors.error
-                              : Colors.amber,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(
-                        appointment.bookingStatus,
-                        style: GoogleFonts.poppins(color: Colors.white),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

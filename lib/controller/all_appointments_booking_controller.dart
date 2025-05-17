@@ -54,28 +54,7 @@ class AllAppointmentsBookingController extends GetxController {
       context,
     );
 
-    // Convert to calendar map
-    Map<DateTime, List<AppointmentBookingModel>> eventsMap = {};
-
-    for (var appt in appointments) {
-      try {
-        final date = DateTime.parse(
-          appt.appointmentDate,
-        ); // Format: "yyyy-MM-dd"
-        final day = DateTime(date.year, date.month, date.day); // normalize
-
-        if (eventsMap[day] == null) {
-          eventsMap[day] = [appt];
-        } else {
-          eventsMap[day]!.add(appt);
-        }
-      } catch (e) {
-        print("Invalid appointmentDate format: ${appt.appointmentDate}");
-      }
-    }
-
-    calendarEvents.value = eventsMap;
-    selectedAppointments.value = eventsMap[selectedDate.value] ?? [];
+  
     isLoading.value = false;
   }
   void onDaySelected(DateTime selected, DateTime focused) {

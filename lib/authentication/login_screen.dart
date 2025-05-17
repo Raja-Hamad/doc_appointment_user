@@ -1,7 +1,9 @@
 
 import 'package:doctor_appointment_user/config/routes/route_names.dart';
+import 'package:doctor_appointment_user/controller/forget_password_controller.dart';
 import 'package:doctor_appointment_user/controller/login_controller.dart';
 import 'package:doctor_appointment_user/utils/app_colors.dart';
+import 'package:doctor_appointment_user/widgets/forget_password_bottom_sheet.dart';
 import 'package:doctor_appointment_user/widgets/submit_button_widget.dart';
 import 'package:doctor_appointment_user/widgets/text_field_widget.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+    ForgetPasswordController forgetPasswordController = Get.put(
+    ForgetPasswordController(),
+  );
   LoginController loginController = Get.put(LoginController());
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -61,6 +66,40 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: passwordController,
               isPassword: true,
               label: "Password",
+            ),
+               const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    isScrollControlled: true,
+                    backgroundColor: AppColors.white,
+                    builder:
+                        (_) => ForgetPasswordBottomSheet(
+                          controller:
+                              forgetPasswordController.emailController.value,
+                          title: "Forget Password",
+                          buttonText: "Reset Password",
+                          onSubmit: () {
+                            forgetPasswordController.resetPassword(context);
+                            // Call your reset method here
+                          },
+                        ),
+                  );
+                },
+
+                child: Text(
+                  "Forget Password?",
+                  style: GoogleFonts.poppins(color: AppColors.primary),
+                ),
+              ),
             ),
             const SizedBox(height: 32),
             Obx(() {
