@@ -19,7 +19,6 @@ void main() async {
 
   // Ensure Firebase is initialized only once
   await Firebase.initializeApp(
-    name: 'Doctor App User',
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
