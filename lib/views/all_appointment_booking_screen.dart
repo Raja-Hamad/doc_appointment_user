@@ -4,7 +4,7 @@ import 'package:doctor_appointment_user/widgets/all_appointments_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 class AllAppointmentBookingScreen extends StatefulWidget {
   const AllAppointmentBookingScreen({super.key});
 
@@ -33,6 +33,36 @@ class _AllAppointmentBookingScreenState
         child: Obx(() {
           if (controller.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
+          }
+          else if(controller.list.isEmpty){
+             return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 100),
+                          SvgPicture.asset("assets/svgs/nothing_found.svg"),
+                          const SizedBox(height: 30),
+                          Text(
+                            'No appointment found.',
+                            style: GoogleFonts.dmSans(
+                              color: Color(0xff150B3D),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Start booking the appointments.',
+                            style: GoogleFonts.openSans(
+                              color: Color(0xff524B6B),
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
           }
 
           return SingleChildScrollView(

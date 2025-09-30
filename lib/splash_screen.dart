@@ -24,6 +24,14 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SizedBox(
+              height: 200,
+              width: 200,
+              child: Image.asset("assets/images/splash_icon.png",
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,),
+            ),
             Text(
               "Welcome To",
               style: GoogleFonts.poppins(
@@ -41,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
 
-            const SizedBox(height: 200,),
+            const SizedBox(height: 100,),
             SubmitButtonWidget(
               onPress: ()async{
                 

@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doctor_appointment_user/authentication/login_screen.dart';
 import 'package:doctor_appointment_user/controller/all_doctors_controller.dart';
 import 'package:doctor_appointment_user/model/doctor_model.dart';
 import 'package:doctor_appointment_user/utils/app_colors.dart';
 import 'package:doctor_appointment_user/utils/local_storage.dart';
 import 'package:doctor_appointment_user/views/doctor_details_view.dart';
 import 'package:doctor_appointment_user/widgets/drawer_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,8 +29,63 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
   void initState() {
     super.initState();
     allDoctorsController.fetchDoctors();
+    getValues();
   }
 
+ LocalStorage localStorage = LocalStorage();
+  String? name;
+  String? email;
+  String? role;
+  String? adminDeviceToken;
+  String? phone;
+
+  String? imageUrl;
+
+
+
+  getValues() async {
+    name = await localStorage.getValue("userName");
+    email = await localStorage.getValue("email");
+    role = await localStorage.getValue("role");
+    imageUrl = await localStorage.getValue("imageUrl");
+    phone = await localStorage.getValue("phone");
+    adminDeviceToken = await localStorage.getValue("userDeviceToken");
+    if (kDebugMode) {
+      print("Device Token of the admin is ${adminDeviceToken ?? ""}");
+    }
+
+    setState(() {});
+  }
+
+  Future<void> logout() async {
+    // Step 1: local storage clear karo
+    await localStorage.clear("id");
+    await localStorage.clear("name");
+
+    await localStorage.clear("imageUrl");
+
+    await localStorage.clear("phone");
+
+    await localStorage.clear("role");
+
+    await localStorage.clear("email");
+
+    await localStorage.clear("userDeviceToken");
+
+    await localStorage.clear("address");
+
+    await localStorage.clear("gender");
+
+    await localStorage.clear("dob");
+    
+
+    await FirebaseAuth.instance.signOut();
+
+    // Step 3: Navigate back to SplashView (stack clear)
+    Get.offAll(() => LoginScreen());
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
