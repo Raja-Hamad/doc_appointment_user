@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:uuid/uuid.dart';
-
 class ReportCommentController extends GetxController {
   final FirestoreServices _firestoreServices = FirestoreServices();
   var isLoading = false.obs;

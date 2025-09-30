@@ -1,6 +1,6 @@
 import 'package:doctor_appointment_user/utils/app_colors.dart';
-import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class TextFieldWidget extends StatefulWidget {
