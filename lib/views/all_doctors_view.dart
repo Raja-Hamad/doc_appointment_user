@@ -115,125 +115,132 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
 
-        child: Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream:
-                FirebaseFirestore.instance.collection("doctors").snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Center(
-                  child: CircularProgressIndicator(color: Colors.black),
-                );
-              } else {
-                final doctorsList =
-                    snapshot.data!.docs
-                        .map(
-                          (json) => DoctorModel.fromMap(
-                            json.data() as Map<String, dynamic>,
-                          ),
-                        )
-                        .toList();
-                return ListView.separated(
-                  itemCount: doctorsList.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final doctor = doctorsList[index];
-
-                    return Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 6,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Doctor image
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage:
-                                doctor.imageUrl != null
-                                    ? NetworkImage(doctor.imageUrl)
-                                    : const AssetImage(
-                                          'assets/images/avatar_placeholder.png',
-                                        )
-                                        as ImageProvider,
-                            backgroundColor: Colors.grey[200],
-                          ),
-                          const SizedBox(width: 16),
-
-                          // Doctor details
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  doctor.name ?? 'No Name',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  doctor.specialization ?? 'No Specialization',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => DoctorDetailsView(
-                                        doctorModel: doctor,
-                                      ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(5),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance.collection("doctors").snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(color: Colors.black),
+                    );
+                  } else {
+                    final doctorsList =
+                        snapshot.data!.docs
+                            .map(
+                              (json) => DoctorModel.fromMap(
+                                json.data() as Map<String, dynamic>,
                               ),
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "Book Appointment",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w300,
+                            )
+                            .toList();
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: doctorsList.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final doctor = doctorsList[index];
+              
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 6,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Doctor image
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage:
+                                    doctor.imageUrl != null
+                                        ? NetworkImage(doctor.imageUrl)
+                                        : const AssetImage(
+                                              'assets/images/avatar_placeholder.png',
+                                            )
+                                            as ImageProvider,
+                                backgroundColor: Colors.grey[200],
+                              ),
+                              const SizedBox(width: 16),
+              
+                              // Doctor details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      doctor.name ?? 'No Name',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      doctor.specialization ?? 'No Specialization',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => DoctorDetailsView(
+                                            doctorModel: doctor,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "Book Appointment",
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w300,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+              
+                        // Action buttons
+                      },
                     );
-
-                    // Action buttons
-                  },
-                );
-              }
-            },
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),
